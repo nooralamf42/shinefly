@@ -3,7 +3,7 @@
 import { ObjectId } from "mongodb"
 import { updateTag } from "next/cache"
 import { redirect } from "next/navigation"
-import { checkCredentials, createSession, deleteSession, requireAdmin } from "@/lib/auth"
+import { authConfigError, checkCredentials, createSession, deleteSession, requireAdmin } from "@/lib/auth"
 import { deleteImage, uploadImage } from "@/lib/cloudinary"
 import { products, settings } from "@/lib/mongodb"
 import { PRODUCTS_TAG } from "@/lib/products"
@@ -15,6 +15,9 @@ export type FormState = { error?: string } | undefined
 // ── Auth ────────────────────────────────────────────────────────────
 
 export async function login(_prev: FormState, formData: FormData): Promise<FormState> {
+  const configError = authConfigError()
+  if (configError) return { error: configError }
+
   const email = String(formData.get("email") ?? "")
   const password = String(formData.get("password") ?? "")
   if (!checkCredentials(email, password)) {
