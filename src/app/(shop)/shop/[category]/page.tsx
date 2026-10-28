@@ -6,9 +6,12 @@ import { getCategories, getCategoryBySlug } from "@/lib/products"
 import { categorySlug } from "@/lib/store"
 
 // Prerender every collection at build time; new ones are built on first visit, then cached.
+// Cache Components requires at least one param, so an empty store builds a placeholder that 404s.
 export async function generateStaticParams() {
   const categories = await getCategories()
-  return categories.map((c) => ({ category: categorySlug(c) }))
+  return categories.length > 0
+    ? categories.map((c) => ({ category: categorySlug(c) }))
+    : [{ category: "__placeholder__" }]
 }
 
 export async function generateMetadata(props: PageProps<"/shop/[category]">): Promise<Metadata> {

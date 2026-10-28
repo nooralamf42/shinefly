@@ -10,9 +10,10 @@ import { getSettings } from "@/lib/settings"
 import { categorySlug, formatPrice } from "@/lib/store"
 
 // Prerender every product at build time; products added later are built on first visit, then cached.
+// Cache Components requires at least one param, so an empty store builds a placeholder that 404s.
 export async function generateStaticParams() {
   const ids = await getProductIds()
-  return ids.map((id) => ({ id }))
+  return ids.length > 0 ? ids.map((id) => ({ id })) : [{ id: "__placeholder__" }]
 }
 
 export async function generateMetadata(props: PageProps<"/products/[id]">): Promise<Metadata> {
